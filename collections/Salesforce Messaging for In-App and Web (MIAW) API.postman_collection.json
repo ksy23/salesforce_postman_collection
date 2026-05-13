@@ -1,0 +1,666 @@
+{
+  "info": {
+    "_postman_id": "b0864759-9662-4b53-abe1-86ad40fef542",
+    "name": "Salesforce Messaging for In-App and Web (MIAW) API",
+    "description": "The [Messaging for In-App and Web REST API](https://developer.salesforce.com/docs/service/messaging-api/overview) allows you to programmatically manage customer conversations made through mobile apps or websites through a custom client deployment. It allows you to:\n\n- create a highly customized mobile app or web messaging experiences\n    \n- interact with Agentforce agents and support representatives\n    \n- send messages\n    \n- list messages\n    \n- stream messages and events from the other participant using the [server-sent events](https://developer.salesforce.com/docs/service/messaging-api/references/about/server-sent-events.html) endpoint\n    \n\n📚 [Messaging for In-App and Web REST API Reference](https://developer.salesforce.com/docs/service/messaging-api/references/miaw-api-reference?meta=Summary)\n\n**⚠️ Disclaimers:**\n\n- this collection does not include all endpoints\n    \n- this collection is not covered by Salesforce support and SLAs.\n    \n- [rate limits](https://help.salesforce.com/s/articleView?id=service.miaw_rate_limits.htm&type=5) apply when using the API.\n    \n\n## Setup\n\nThe Messaging for In-App and Web API requires a support agent or Agentforce Agent. You can an [Agentforce and Data Cloud Developer Edition account](https://trailhead.salesforce.com/content/learn/projects/quick-start-prompt-builder/get-started-with-prompt-builder) to experiment.\n\n1. [Fork](https://app.getpostman.com/run-collection/12721794-b0864759-9662-4b53-abe1-86ad40fef542?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D12721794-b0864759-9662-4b53-abe1-86ad40fef542%26entityType%3Dcollection%26workspaceId%3D34382471-0c97-40e5-a206-f947271665c4) this collection.\n    \n2. Create and deploy an Agentforce Service Agent.\n    \n3. Configure and [deploy Omni-Channel Routing](https://help.salesforce.com/s/articleView?id=service.messaging_routing_flows.htm&type=5).\n    \n4. [Configure and deploy a Custom Client Deployment](https://help.salesforce.com/s/articleView?id=service.miaw_deployment_custom.htm&type=5) for Messaging for In-App and Web.\n    \n\nWhen you complete Step 3, you'll get access to your Custom Client credentials: your SCRT URL, Org ID, and Developer Name. Note these values as you'll need to include as collection variables.\n\n## Variables Reference\n\nThe collection relies on the following required variables:\n\n| Variable | Description |\n| --- | --- |\n| `scrt-url` | Salesforce SCRT URL from Custom Client Deployment. |\n| `org-id` | Salesforce Org ID from Custom Client Deployment. |\n| `developer-name` | Salesforce Developer Name. |\n| `_access-token` | Access token that's generated when using either of the Auth requests.  <br>Do not edit this value manually. |\n| `_conversation-id` | A converation session UUID that is automatically generated when using the **Create conversation** request**.**  <br>Do not edit this value manually. |",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "54805836",
+    "_collection_link": "https://go.postman.co/collection/12721794-b0864759-9662-4b53-abe1-86ad40fef542?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Generate access token for unauthenticated user",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const context = pm.environment.name ? pm.environment : pm.collectionVariables;",
+                  "",
+                  "const body = pm.response.json();",
+                  "context.set('_access-token', body.accessToken);"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "\n{\n    \"orgId\": \"{{org-id}}\",\n    \"esDeveloperName\": \"{{developer-name}}\",\n    \"capabilitiesVersion\": \"1\",\n    \"platform\": \"Web\",\n    \"context\": {\n        \"appName\": \"customClientDemo\",\n        \"clientVersion\": \"1.0.0\"\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{scrt-url}}/iamessage/api/v2/authorization/unauthenticated/access-token",
+              "protocol": "https",
+              "host": [
+                "{{scrt-url}}"
+              ],
+              "path": [
+                "iamessage",
+                "api",
+                "v2",
+                "authorization",
+                "unauthenticated",
+                "access-token"
+              ]
+            },
+            "description": "Generates an access token for an unverified “guest” user."
+          },
+          "response": []
+        },
+        {
+          "name": "Generate access token for authenticated user",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const context = pm.environment.name ? pm.environment : pm.collectionVariables;",
+                  "",
+                  "const body = pm.response.json();",
+                  "context.set('_access-token', body.accessToken); "
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "\n{\n    \"orgId\": \"{{org-id}}\",\n    \"esDeveloperName\": \"{{developer-name}}\",\n    \"capabilitiesVersion\": \"1\",\n    \"platform\": \"Web\",\n    \"context\": {\n        \"appName\": \"customClientDemo\",\n        \"clientVersion\": \"1.0.0\"\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{scrt-url}}/iamessage/api/v2/authorization/authenticated/access-token",
+              "protocol": "https",
+              "host": [
+                "{{scrt-url}}"
+              ],
+              "path": [
+                "iamessage",
+                "api",
+                "v2",
+                "authorization",
+                "authenticated",
+                "access-token"
+              ]
+            },
+            "description": "Generates an access token. Use the access token as a bearer token to make requests to the Messaging for In-App and Web APIs."
+          },
+          "response": []
+        },
+        {
+          "name": "Revoke token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const context = pm.environment.name ? pm.environment : pm.collectionVariables;",
+                  "context.set('_access-token', '');",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "https://{{scrt-url}}/iamessage/api/v2/authorization/authenticated/access-token",
+              "protocol": "https",
+              "host": [
+                "{{scrt-url}}"
+              ],
+              "path": [
+                "iamessage",
+                "api",
+                "v2",
+                "authorization",
+                "authenticated",
+                "access-token"
+              ]
+            },
+            "description": "Revokes an access token that was generated for an authenticated user."
+          },
+          "response": []
+        },
+        {
+          "name": "Generate continuation token",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{_access-token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://{{scrt-url}}/iamessage/api/v2/authorization/continuation-access-token",
+              "protocol": "https",
+              "host": [
+                "{{scrt-url}}"
+              ],
+              "path": [
+                "iamessage",
+                "api",
+                "v2",
+                "authorization",
+                "continuation-access-token"
+              ]
+            },
+            "description": "Generates a JSON Web Token (JWT). This endpoint supports web users using multiple tabs, and it doesn't extend the JWT expiration time."
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "noauth"
+      }
+    },
+    {
+      "name": "Conversation",
+      "item": [
+        {
+          "name": "Create conversation",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const context = pm.environment.name ? pm.environment : pm.collectionVariables;",
+                  "",
+                  "const uuid = require('uuid'); ",
+                  "context.set(\"_conversation-id\", uuid.v4().toLowerCase());"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"conversationId\": \"{{_conversation-id}}\",\n    \"routingAttributes\": {\n        \"X_Conversation_ID\": \"{{_conversation-id}}\"\n    },\n    \"esDeveloperName\": \"{{developer-name}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{scrt-url}}/iamessage/api/v2/conversation",
+              "protocol": "https",
+              "host": [
+                "{{scrt-url}}"
+              ],
+              "path": [
+                "iamessage",
+                "api",
+                "v2",
+                "conversation"
+              ]
+            },
+            "description": "Creates a conversation if it doesn't exist. This API can also pass pre-chat data in the form of routing attributes."
+          },
+          "response": []
+        },
+        {
+          "name": "Close conversation",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{scrt-url}}/iamessage/api/v2/conversation/:conversationId?esDeveloperName={{developer-name}}",
+              "protocol": "https",
+              "host": [
+                "{{scrt-url}}"
+              ],
+              "path": [
+                "iamessage",
+                "api",
+                "v2",
+                "conversation",
+                ":conversationId"
+              ],
+              "query": [
+                {
+                  "key": "esDeveloperName",
+                  "value": "{{developer-name}}"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "conversationId",
+                  "value": "{{_conversation-id}}"
+                }
+              ]
+            },
+            "description": "Closes a conversation between an end user and agent. After a conversation is closed, end users and agents can no longer send messages in this conversation. Instead, they must start a new conversation."
+          },
+          "response": []
+        },
+        {
+          "name": "List conversations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://{{scrt-url}}/iamessage/api/v2/conversation/list",
+              "protocol": "https",
+              "host": [
+                "{{scrt-url}}"
+              ],
+              "path": [
+                "iamessage",
+                "api",
+                "v2",
+                "conversation",
+                "list"
+              ],
+              "query": [
+                {
+                  "key": "inclClosedConvs",
+                  "value": "true",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                },
+                {
+                  "key": "conversationId",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "startTimestamp",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "endTimestamp",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Returns a list of all conversations for a specific end user. This API is useful to determine if an end user is part of a specific conversation. The list is always returned in chronological ascending order."
+          },
+          "response": []
+        },
+        {
+          "name": "Retrieve conversation routing status",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{scrt-url}}/iamessage/api/v2/conversation/:conversationId",
+              "protocol": "https",
+              "host": [
+                "{{scrt-url}}"
+              ],
+              "path": [
+                "iamessage",
+                "api",
+                "v2",
+                "conversation",
+                ":conversationId"
+              ],
+              "variable": [
+                {
+                  "key": "conversationId",
+                  "value": "{{_conversation-id}}"
+                }
+              ]
+            },
+            "description": "Retrieves the routing status of the specified conversation."
+          },
+          "response": []
+        },
+        {
+          "name": "List conversation entries",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{scrt-url}}/iamessage/api/v2/conversation/:conversationId/entries",
+              "protocol": "https",
+              "host": [
+                "{{scrt-url}}"
+              ],
+              "path": [
+                "iamessage",
+                "api",
+                "v2",
+                "conversation",
+                ":conversationId",
+                "entries"
+              ],
+              "variable": [
+                {
+                  "key": "conversationId",
+                  "value": "{{_conversation-id}}"
+                }
+              ]
+            },
+            "description": "Lists conversation entries for the specified conversation."
+          },
+          "response": []
+        },
+        {
+          "name": "Send message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-conversation-id",
+                "value": "{{converation-id}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": {\n    \"id\": \"{{$randomUUID}}\",\n    \"messageType\": \"StaticContentMessage\",\n    \"staticContent\": {\n      \"formatType\": \"Text\",\n      \"text\": \"Hi, can you help me?\"\n    }\n  },\n  \"esDeveloperName\": \"{{developer-name}}\",\n  \"isNewMessagingSession\": false,\n  \"language\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{scrt-url}}/iamessage/api/v2/conversation/:conversationId/message",
+              "protocol": "https",
+              "host": [
+                "{{scrt-url}}"
+              ],
+              "path": [
+                "iamessage",
+                "api",
+                "v2",
+                "conversation",
+                ":conversationId",
+                "message"
+              ],
+              "variable": [
+                {
+                  "key": "conversationId",
+                  "value": "{{_conversation-id}}"
+                }
+              ]
+            },
+            "description": "Sends a message from the end user to the agent or bot. The message is sent one at a time and each message can be in a different form, depending on the message type and its payload."
+          },
+          "response": []
+        },
+        {
+          "name": "Server-sent events",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.response.stream.on(\"CONVERSATION_MESSAGE\", (event) => {",
+                  "    try {",
+                  "        const data = JSON.parse(event.data); ",
+                  "        const sender = data.conversationEntry.sender.role.toLowerCase();",
+                  "        if (sender === \"chatbot\") {",
+                  "            const payload = JSON.parse(data.conversationEntry.entryPayload); ",
+                  "            console.log(payload.abstractMessage.staticContent.text);",
+                  "        }",
+                  "    } catch (err) {",
+                  "        console.error(\"Message parse error: \", err); ",
+                  "    }",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Org-Id",
+                "value": "{{org-id}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"conversationId\": \"{{$randomUUID}}\",\n    \"esDeveloperName\": \"{{developer-name}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{scrt-url}}/eventrouter/v1/sse",
+              "protocol": "https",
+              "host": [
+                "{{scrt-url}}"
+              ],
+              "path": [
+                "eventrouter",
+                "v1",
+                "sse"
+              ]
+            },
+            "description": "The Server-Sent Events endpoint is the interface through which clients establish connections to server-sent events to receive messages and events from the server.\n\nThese messages encompass a variety of content, such as messages sent by agents or bots, system events, echoes of end-user messages, participant modifications, and similar events. Once a call is made to the endpoint, the browser keeps the connection open and receives the events from the server."
+          },
+          "response": []
+        },
+        {
+          "name": "Add typing indicator",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"entryType\": \"TypingStartedIndicator\",\n  \"id\": \"{{$randomUUID}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{scrt-url}}/iamessage/api/v2/conversation/:conversationId/entry",
+              "protocol": "https",
+              "host": [
+                "{{scrt-url}}"
+              ],
+              "path": [
+                "iamessage",
+                "api",
+                "v2",
+                "conversation",
+                ":conversationId",
+                "entry"
+              ],
+              "variable": [
+                {
+                  "key": "conversationId",
+                  "value": "{{_conversation-id}}"
+                }
+              ]
+            },
+            "description": "Adds a typing indicator to notify participants when typing starts or stops. Add a “typing started” indicator to notify the agents or bots when the end user starts typing a message. Add a “typing stopped” indicator to notify the agents or bots when the end user stops typing."
+          },
+          "response": []
+        },
+        {
+          "name": "Send reading receipts",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"acks\": [\n    {\n      \"id\": \"{{$randomUUID}}\",\n      \"entryType\": \"Delivery\",\n      \"conversationEntryId\": \"{{_conversation-id}}\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://{{scrt-url}}/iamessage/api/v2/conversation/:conversationId/acknowledge-entries",
+              "protocol": "https",
+              "host": [
+                "{{scrt-url}}"
+              ],
+              "path": [
+                "iamessage",
+                "api",
+                "v2",
+                "conversation",
+                ":conversationId",
+                "acknowledge-entries"
+              ],
+              "variable": [
+                {
+                  "key": "conversationId",
+                  "value": "{{_conversation-id}}"
+                }
+              ]
+            },
+            "description": "Sends a list of conversation entries with “delivery” acknowledgements and “read” receipts. Each conversation entry in the list indicates whether the entry from the agent or bot has been delivered to or read by the end user."
+          },
+          "response": []
+        },
+        {
+          "name": "Retrieve conversation transcript",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://{{scrt-url}}/iamessage/api/v2/conversation/:conversationId/transcript?esDeveloperName={{developer-name}}",
+              "protocol": "https",
+              "host": [
+                "{{scrt-url}}"
+              ],
+              "path": [
+                "iamessage",
+                "api",
+                "v2",
+                "conversation",
+                ":conversationId",
+                "transcript"
+              ],
+              "query": [
+                {
+                  "key": "esDeveloperName",
+                  "value": "{{developer-name}}"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "conversationId",
+                  "value": "{{_conversation-id}}"
+                }
+              ]
+            },
+            "description": "Generates a transcript of the last 200 conversation entries. The transcript is generated into binary format and saved as a PDF file.  \n\nBefore you continue, verify that the administrator has turned on the ability to download transcripts for end users. See [Allow End Users to Download a Transcript of a Messaging Session](https://help.salesforce.com/s/articleView?id=sf.miaw_download_transcript.htm) for more information."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{_access-token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "scrt-url",
+      "value": ""
+    },
+    {
+      "key": "org-id",
+      "value": ""
+    },
+    {
+      "key": "developer-name",
+      "value": ""
+    },
+    {
+      "key": "_access-token",
+      "value": ""
+    },
+    {
+      "key": "_conversation-id",
+      "value": ""
+    }
+  ]
+}
